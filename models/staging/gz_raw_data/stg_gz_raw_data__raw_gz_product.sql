@@ -9,7 +9,7 @@ source as (
 renamed as (
 
     select
-        products_id,
+        products_id as product_id ,
      
         cast(purchse_price as float64) as purchase_price
     from source
