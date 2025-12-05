@@ -1,0 +1,57 @@
+version: 2
+
+sources:
+  - name: gz_raw_data              
+    database: custom-range-475514-f1
+    schema: dbt_lderzi  
+    loader: bigquery
+    freshness:
+      warn_after: {count: 12, period: hour}
+      
+    tables:
+# SALES
+      - name: raw_gz_sales
+        description: sales of Greenweez / we have on row per product_id found in each orders_id
+        loaded_at_field: date_date
+        columns:
+          - name: date_date
+            description: "Date of purchase"
+          - name: orders_id
+            description: "ID of the order"
+          - name: pdt_id
+            description: "Product identifier in the order"
+          - name: revenue
+            description: "Revenue for this order line"
+          - name: quantity
+            description: "Quantity sold in this order line"
+        tests:
+          - dbt_utils.unique_combination_of_columns:
+             combination_of_columns: ['orders_id', 'pdt_id']
+# PRODUCT
+      - name: raw_gz_product
+        description: product of Greenweez / we have on row per product_id found and the purchace price
+        columns:
+          - name: products_id
+            description: "Product identifier in the order"
+            tests:
+              - not_null
+              - unique
+          - name: purchase_price
+            description: "Product price"
+
+
+# SHIP
+      - name: raw_gz_ship
+        description: product of Greenweez / we have on row per orders_id and the shipping cost
+        columns:
+          - name: orders_id
+            description: "Order indentifier"
+            tests:
+              - not_null
+              - unique
+          - name: shipping_fee
+            description: "Shipping fee"
+          - name: logcost
+            description: "Logitic cost"
+          - name: ship_cost
+            description: "Shipping cost"
